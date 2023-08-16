@@ -7,7 +7,7 @@ from data import data_sourcing, MTMCI_func, data_processing
 from initialize import load_expmntl_parms, intrd_tables_batch
 from optimize import optimize_interdiction_batch, optimizeroute_multidto
 
-np.seterr(divide = 'ignore')
+np.seterr(divide = 'ignore') # ignore
 
 ERUNS = 11
 TSTART = 0
