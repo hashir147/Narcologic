@@ -92,8 +92,9 @@ def calc_neival(c_trans, p_sl, y_node, q_node, lccf, rtpref, dtonei, cutflag, to
                 subicut = np.where(rankroute[idto, 0] >= 0)[0][0:int(edgechange[j][0])] # Hashir: edgechange[j][0]: float type -- > convert to int type
             if cutflag[int(dtos[j] - 1), 0] == 1:
                 subicut = []
-            # icut = np.concatenate((icut, idto[subicut]), axis=0)
-            icut.append(idto[subicut])
+            icut = np.concatenate((icut, idto[subicut]), axis=0)
+            #icut.append(idto[subicut])
+            #icut.extend(idto[subicut])
     else:
         if len(np.where(valuex > 0)[0]) == 0:
             icut = np.transpose(np.arange(0, np.where(np.cumsum(rankroute[:, 5]) >= totstock)[0][0]))
@@ -106,14 +107,24 @@ def calc_neival(c_trans, p_sl, y_node, q_node, lccf, rtpref, dtonei, cutflag, to
         else:
             icut = np.where(rankroute[:, 0] >= 0)
 
+        icut = np.concatenate((icut, idto[subicut]), axis=0)
+
+    icut= icut.astype(int)
     neipick = rankroute[icut, 3]
     neivalue = rankroute[icut, 0]
 
     return neipick, neivalue, valuex
 
 def calc_intrisk(sloccur, t_eff, alpharisk, betarisk, timeweight):
-    slevnt = np.sum(np.multiply(sloccur, np.tile(np.transpose(np.power(timeweight, t_eff)), (1, len(sloccur[1, :])))),
+    t_eff= t_eff.reshape(-1,1)
+    length=len(sloccur[1, :])
+    test = np.transpose (np.power(timeweight, t_eff))
+    test1 = np.tile(test, (1,length))
+    slevnt = np.sum(np.multiply(sloccur, test1),
                     0, keepdims=True)  # make sure to load t_eff as 2D array in order for this to work properly
+                  #  0, keepdims=True)  # make sure to load t_eff as 2D array in order for this to work properly
+
     tmevnt = np.sum(np.power(timeweight, t_eff))
     sl_risk = (slevnt + alpharisk) / (tmevnt + alpharisk + betarisk)
     return sl_risk, slevnt, tmevnt
+
